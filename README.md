@@ -1,70 +1,136 @@
-# Getting Started with Create React App
+**Задание #1** — Реализуйте хук useFetch(), который можно будет использовать следующим образом:
+```
+import { useFetch } from './useFetch';
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+function Demo() {
+  const {
+    data,
+    isLoading,
+    error,
+    refetch
+  } = useFetch('https://jsonplaceholder.typicode.com/posts');
+  
+  return (
+    <div>
+      <div>
+        <button onClick={() => refetch({
+          params: {
+            _limit: 3
+          }
+        })}>
+          Перезапросить
+        </button>
+      </div>
+      {isLoading && 'Загрузка...'}
+      {error && 'Произошла ошибка'}
+      {data && !isLoading && data.map(item => <div key={item.id}>{item.title}</div>) }
+    </div>
+  );
+}
+```
 
-## Available Scripts
+**Задание #2** — Реализуйте хук useLocalStorage(), который можно будет использовать следующим образом:
+```
+import { useLocalStorage } from './useLocalStorage';
 
-In the project directory, you can run:
+function Demo() {
+  const [value, { setItem, removeItem }] = useLocalStorage('some-key');
 
-### `npm start`
+  return (
+    <div>
+      <p>Значение из LocalStorage: {value}</p>
+      <div>
+        <button onClick={() => setItem('new storage value')}>Задать значение</button>
+        <button onClick={() => removeItem()}>Удалить значение</button>
+      </div>
+    </div>
+  );
+}
+```
+Кроме того, необходимо добавить типизацию хука:
+```
+type LocalStorageSetValue = string;
+type LocalStorageReturnValue = LocalStorageSetValue | null;
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+type UseLocalStorage = (key: string) => [
+  value: LocalStorageReturnValue,
+  {
+    setItem: (value: LocalStorageSetValue) => void;
+    removeItem: () => void;
+  },
+];
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**Задание #3** — Реализуйте хук useHover(), который можно будет использовать следующим образом:
+```
+import { useHover } from './useHover';
 
-### `npm test`
+function Demo() {
+  const { hovered, ref } = useHover();
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  return (
+    <div ref={ref}>
+      {hovered ? 'На меня навели мышку' : 'Наведи мышкой на меня'}
+    </div>
+  );
+}
+```
 
-### `npm run build`
+**Задание #4** — Реализуйте хук useViewportSize(), который можно будет использовать следующим образом:
+```
+import { useViewportSize } from '@mantine/hooks';
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function Demo() {
+  const { height, width } = useViewportSize();
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return (
+    <>
+      Width: {width}, height: {height}
+    </>
+  );
+}
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Дополнительное задание #1** — Реализуйте хук useWindowScroll(), который можно будет использовать следующим образом:
+```
+import { useWindowScroll } from './useWindowScroll';
 
-### `npm run eject`
+function Demo() {
+  const [scroll, scrollTo] = useWindowScroll();
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+  return (
+    <div>
+      <p>
+        Scroll position x: {scroll.x}, y: {scroll.y}
+      </p>
+      <button onClick={() => scrollTo({ y: 0 })}>Scroll to top</button>
+    </div>
+  );
+}
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**Дополнительное задание #2** — В этом задании необходимо усложнить хук useToggle(). Теперь он должен принимать массив значений, которые будут переключаться по порядку. Если ничего не передавать то будет переключать между true и false. Хук может использоваться следующим образом:
+```
+import { useToggle } from './useToggle';
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+function Demo() {
+  const [value, toggle] = useToggle(['blue', 'orange', 'cyan', 'teal']);
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  return (
+    <button onClick={() => toggle()}>
+      {value}
+    </button>
+  );
+}
 
-## Learn More
+// Еще примеры использования
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+const [value, toggle] = useToggle(['light', 'dark']);
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+toggle(); // -> value === 'light'
+toggle(); // -> value === 'dark'
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// Так же можно передать конкретное значение и тогда 
+// value станет одним из значений
+toggle('dark'); // -> value === 'dark'
+```
