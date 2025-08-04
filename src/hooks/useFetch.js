@@ -7,34 +7,38 @@ export function useFetch(url) {
   const [urlSt, setUrlSt] = useState(url);
 
   function refetch(params) {
-    const searchParams = new URLSearchParams(params.params).toString();
-    setData(null);
-    setIsLoading(true);
-    setError(null);
-    setUrlSt(`${url}?${searchParams}`);
+    if (url && params) {
+      const searchParams = new URLSearchParams(params.params).toString();
+      setData(null);
+      setIsLoading(true);
+      setError(null);
+      setUrlSt(`${url}?${searchParams}`);
+    }
   }
 
   useEffect(() => {
-    let fetchFunc = setTimeout(() => {
-      fetch(urlSt)
-        .then((res) => {
-          if (!res.ok) {
-            throw Error("bad req error");
-          }
-          return res.json();
-        })
-        .then((data) => {
-          setData(data);
-          setIsLoading(false);
-          setError(null);
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          setError(err.message);
-        });
-    }, 2000);
+    let controller = new AbortController();
 
-    return () => clearTimeout(fetchFunc);
+    fetch(urlSt, {
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Response status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setData(data);
+        setIsLoading(false);
+        setError(null);
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        setError(err.message);
+      });
+
+    return () => controller.abort();
   }, [urlSt]);
 
   return { data, isLoading, error, refetch };

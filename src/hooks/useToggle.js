@@ -9,15 +9,9 @@ export function useToggle(initVal = [false, true]) {
     const { type } = action;
     switch (type) {
       case "TOGGLE":
-        let arr = [...state];
-        let first = arr[0];
-        let arrLen = arr.length;
-        arr.splice(0, 1);
-        arr[arrLen - 1] = first;
-        state = [...arr];
-
         setValueToggle(state[0].toString());
-        return state;
+        const newArr = [...state.slice(1), state[0]];
+        return newArr;
 
       case "SINGLE":
         setValueToggle(state);
